@@ -5,7 +5,7 @@ FLine centerLine;
 
 Puck puck;
 Mallet player;
-Enemy enemy;
+Opponent opponent;
 
 FMouseJoint mouseJoint; // Connection between player's mallet and mouse's movement
 
@@ -14,7 +14,7 @@ PFont gameFont;
 final float EDGE_WIDTH = 20;
 
 int playerScore = 0;
-int enemyScore = 0;
+int opponentScore = 0;
 
 // Goal Scene
 boolean isPlayersGoal = true;
@@ -47,10 +47,10 @@ void setup() {
   player.setFill(255, 100, 100);
   field.add(player);
 
-  enemy = new Enemy(60, 25);
-  enemy.setPosition(width / 2, height / 4);
-  enemy.setFill(100, 100, 255);
-  field.add(enemy);
+  opponent = new Opponent(60, 25);
+  opponent.setPosition(width / 2, height / 4);
+  opponent.setFill(100, 100, 255);
+  field.add(opponent);
 
   mouseJoint = new FMouseJoint(player, 0, 0);
   mouseJoint.setNoStroke();
@@ -65,7 +65,7 @@ void draw() {
   
   textFont(gameFont, 30);
   text(String.valueOf(playerScore), 50, 750);
-  text(String.valueOf(enemyScore), 50, 70);
+  text(String.valueOf(opponentScore), 50, 70);
   
   if (mouseY < height / 2 + 30) { // Restrict the range of player's movement
     mouseY = height / 2 + 30;
@@ -84,10 +84,10 @@ void draw() {
       } else {
         puck.setPosition(width / 2, height / 4 * 3);
         
-        // Enemy will be back to the original position
-        enemy.destinationX = width / 2;
-        enemy.destinationY = height / 4;
-        enemy.setSpeed();
+        // Opponent will be back to the original position
+        opponent.destinationX = width / 2;
+        opponent.destinationY = height / 4;
+        opponent.setSpeed();
       }
       
     } else {
@@ -111,15 +111,15 @@ void draw() {
     isPlayersGoal = true;
     isGoalScene = true;
     return;
-  } else if (puck.y > height && puck.x > width / 3 && puck.x < width / 3 * 2) { // Enemy's goal
-    enemyScore++;
+  } else if (puck.y > height && puck.x > width / 3 && puck.x < width / 3 * 2) { // Opponent's goal
+    opponentScore++;
     isPlayersGoal = false;
     isGoalScene = true;
     return;
   }
 
-  enemy.checkPuckCondition();
-  enemy.move();
+  opponent.checkPuckCondition();
+  opponent.move();
 
   // If puck is outside the field
   if (puck.x < EDGE_WIDTH + puck.r) { 
@@ -145,11 +145,11 @@ void setupEdges() {
 }
 
 void contactEnded(FContact contact) {
-  // When player or enemy hit the puck
+  // When player or opponent hit the puck
   if ((contact.getBody1() == player && contact.getBody2() == puck) || (contact.getBody1() == puck && contact.getBody2() == player) || 
-    (contact.getBody1() == enemy && contact.getBody2() == puck) || (contact.getBody1() == puck && contact.getBody2() == enemy)) {
-    enemy.setDestinationWhenReceiving();
-    enemy.setSpeed();
+    (contact.getBody1() == opponent && contact.getBody2() == puck) || (contact.getBody1() == puck && contact.getBody2() == opponent)) {
+    opponent.setDestinationWhenReceiving();
+    opponent.setSpeed();
   }
 }
 
@@ -230,14 +230,14 @@ class Mallet extends FCircle {
   }
 }
 
-class Enemy extends Mallet {
+class Opponent extends Mallet {
   float maxSpeed;
   float speedX;
   float speedY;
   float destinationX;
   float destinationY;
 
-  Enemy(float size, float maxSpeed) {
+  Opponent(float size, float maxSpeed) {
     super(size);
     this.maxSpeed = maxSpeed;
     this.speedX = 0;
@@ -248,7 +248,7 @@ class Enemy extends Mallet {
   }
 
   void checkPuckCondition() {
-    if (puck.y < height / 2 - puck.r && Math.abs(puck.speedY) < 600) { // When puck is in enemy's area and it isn't fast
+    if (puck.y < height / 2 - puck.r && Math.abs(puck.speedY) < 600) { // When puck is in opponent's area and it isn't fast
       if (this.speedX == 0 && this.speedY == 0) {
         setDestinationWhenAttacking();
         setSpeed();
@@ -271,7 +271,7 @@ class Enemy extends Mallet {
     }
   }
 
-  void setSpeed() { // Calculate and set the speed of enemy
+  void setSpeed() { // Calculate and set the speed of opponent
     if (this.destinationX == 0 && this.destinationY == 0) {
       return;
     }
@@ -335,7 +335,7 @@ class Enemy extends Mallet {
     }
   }
 
-  void setDestinationWhenReceiving() { // Calculate player's hit course and set the destination of enemy's mallet
+  void setDestinationWhenReceiving() { // Calculate player's hit course and set the destination of opponent's mallet
     // y = ax + b
     float a = puck.speedY / puck.speedX;
     if (puck.speedY > 0) {
@@ -372,7 +372,7 @@ class Enemy extends Mallet {
     this.destinationY = EDGE_WIDTH + this.r * 2;
   }
 
-  void setDestinationWhenAttacking() { // Calculate the shot course and set the destination of enemy's mallet
+  void setDestinationWhenAttacking() { // Calculate the shot course and set the destination of opponent's mallet
     float goalMinX = width / 3.0 + puck.r;
     float goalMaxX = width / 3.0 * 2.0 - puck.r;
     float goalY = height - EDGE_WIDTH;

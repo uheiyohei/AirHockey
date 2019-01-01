@@ -1,5 +1,7 @@
 # AirHockey
-Processingで作成したエアホッケーゲームです。
+An air hockey game developed with Processing.
 
-マウスを使ってマレット(打つ道具)を動かします。
-敵はパックの動きに合わせて動き、シュートしてくるので、それを上手く防ぎながら、ゴールを狙って下さい。
+Use your mouse to move mallet.
+The opponent moves to block your shot and get goals, so try to beat it!
+
+This software uses a physics engine library "fisica."
